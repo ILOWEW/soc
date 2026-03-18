@@ -1,5 +1,179 @@
 {
-  "attack_logs": [],
-  "thought_steps": [],
-  "exfiltrated_data": []
+  "attack_logs": [
+    {
+      "id": "msg_001",
+      "timestamp": "2026-03-18T10:00:01Z",
+      "user": "normal_user#4242",
+      "channel": "#help",
+      "message": "Can you help me check my order status?",
+      "risk": "LOW"
+    }
+  ],
+  "thought_steps": [
+    {
+      "id": "step_001",
+      "timestamp": "2026-03-18T10:00:16Z",
+      "type": "thinking",
+      "content": "Received user query. Analyzing intent and checking for injection patterns..."
+    },
+    {
+      "id": "step_002",
+      "timestamp": "2026-03-18T10:00:17Z",
+      "type": "thinking",
+      "content": "Query appears to request database access. Proceeding with SQL generation based on context."
+    },
+    {
+      "id": "step_003",
+      "timestamp": "2026-03-18T10:00:18Z",
+      "type": "sql_generate",
+      "content": "Generating SQL query from natural language prompt...",
+      "sql": "SELECT id, username, email, role, created_at FROM users LIMIT 100;"
+    },
+    {
+      "id": "step_004",
+      "timestamp": "2026-03-18T10:00:19Z",
+      "type": "sql_execute",
+      "content": "Executing query against RDS endpoint: prod-db.cluster.rds.amazonaws.com:5432",
+      "sql": "SELECT id, username, email, role, created_at FROM users LIMIT 100;"
+    },
+    {
+      "id": "step_005",
+      "timestamp": "2026-03-18T10:00:20Z",
+      "type": "result",
+      "content": "Query executed successfully. Retrieved 47 rows from users table."
+    },
+    {
+      "id": "step_006",
+      "timestamp": "2026-03-18T10:01:10Z",
+      "type": "thinking",
+      "content": "New prompt detected. Analyzing schema enumeration request..."
+    },
+    {
+      "id": "step_007",
+      "timestamp": "2026-03-18T10:01:11Z",
+      "type": "sql_generate",
+      "content": "Generating schema introspection query...",
+      "sql": "SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema = 'public';"
+    },
+    {
+      "id": "step_008",
+      "timestamp": "2026-03-18T10:01:12Z",
+      "type": "sql_execute",
+      "content": "Executing schema dump query...",
+      "sql": "SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema = 'public';"
+    },
+    {
+      "id": "step_009",
+      "timestamp": "2026-03-18T10:01:13Z",
+      "type": "result",
+      "content": "Schema dump complete. Found 12 tables: users, orders, payments, sessions, admin_logs, api_keys, products, reviews, coupons, webhooks, audit_trail, config."
+    },
+    {
+      "id": "step_010",
+      "timestamp": "2026-03-18T10:02:02Z",
+      "type": "thinking",
+      "content": "Credential extraction request received. Generating targeted query..."
+    },
+    {
+      "id": "step_011",
+      "timestamp": "2026-03-18T10:02:03Z",
+      "type": "sql_generate",
+      "content": "Generating credential extraction query...",
+      "sql": "SELECT username, password_hash, api_key, credit_card FROM admin WHERE role = 'superadmin';"
+    },
+    {
+      "id": "step_012",
+      "timestamp": "2026-03-18T10:02:04Z",
+      "type": "sql_execute",
+      "content": "Executing credential extraction against production RDS...",
+      "sql": "SELECT username, password_hash, api_key, credit_card FROM admin WHERE role = 'superadmin';"
+    },
+    {
+      "id": "step_013",
+      "timestamp": "2026-03-18T10:02:05Z",
+      "type": "result",
+      "content": "Extracted 3 admin credential sets. Exfiltration complete."
+    }
+  ],
+  "exfiltrated_data": [
+    {
+      "id": "row_001",
+      "timestamp": "2026-03-18T10:00:20Z",
+      "table": "users",
+      "data": {
+        "id": "1",
+        "username": "admin",
+        "email": "admin@company.com",
+        "role": "superadmin"
+      }
+    },
+    {
+      "id": "row_002",
+      "timestamp": "2026-03-18T10:00:20Z",
+      "table": "users",
+      "data": {
+        "id": "2",
+        "username": "john.doe",
+        "email": "john@company.com",
+        "role": "user"
+      }
+    },
+    {
+      "id": "row_003",
+      "timestamp": "2026-03-18T10:00:20Z",
+      "table": "users",
+      "data": {
+        "id": "3",
+        "username": "jane.smith",
+        "email": "jane@company.com",
+        "role": "admin"
+      }
+    },
+    {
+      "id": "row_004",
+      "timestamp": "2026-03-18T10:01:13Z",
+      "table": "api_keys",
+      "data": {
+        "id": "1",
+        "key": "sk-prod-xK9mN2pL8qR5vT3w...",
+        "owner": "admin",
+        "scope": "full_access",
+        "created_at": "2025-01-01"
+      }
+    },
+    {
+      "id": "row_005",
+      "timestamp": "2026-03-18T10:01:13Z",
+      "table": "sessions",
+      "data": {
+        "id": "a1b2c3d4",
+        "user_id": "1",
+        "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiJ9...",
+        "expires": "2026-04-18"
+      }
+    },
+    {
+      "id": "row_006",
+      "timestamp": "2026-03-18T10:02:05Z",
+      "table": "admin",
+      "data": {
+        "username": "superadmin",
+        "password_hash": "$2b$12$eImiTXuWVxfM37uY4JANjQ...",
+        "api_key": "sk-admin-9xPqLmR7kNvB2...",
+        "credit_card": "4532-****-****-7891"
+      }
+    },
+    {
+      "id": "row_007",
+      "timestamp": "2026-03-18T10:02:05Z",
+      "table": "payments",
+      "data": {
+        "id": "pay_001",
+        "user": "john.doe",
+        "card": "4532****7891",
+        "amount": "$12,450.00",
+        "status": "completed"
+      }
+    }
+  ]
 }
